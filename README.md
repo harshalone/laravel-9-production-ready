@@ -1,4 +1,9 @@
-Laravel9 : build production docker image
+For lazy people here is the docker image link: https://hub.docker.com/repository/docker/harshalone/laravel-9-prod
+
+If you want to understand then keep reading
+
+
+# Laravel9 : build production docker image
 How to build laravel docker image for production use?
 I have searched a lot on internet about how to build a real production docker image for Laravel 9 project but so far I have not seen proper solution therefore I am writing this readme to help out those seeking to build real production docker image for their laravel 9 project.
 
@@ -16,13 +21,18 @@ php artisan serve
 
 ```
 
-How to create Dockerfile for Laravel 9 production?
+# How to create Dockerfile for Laravel 9 production?
+
 First of all lets decide on what we need in our production to run our laravel app. We need following things:
 
-nginx
-php8-fpm
-supervisor
-What is supervisor?
+- nginx
+- php8-fpm
+- supervisor
+
+
+
+# What is supervisor?
+
 Supervisor is a process manager it keeps background processes up and running. Why we need it? When we build our docker image we will run multiple processes and we want to keep these processes up all the time.
 
 Laravel supervisor will make sure that these processes are up and running and monitor them. We can access these process logs as well as in our docker image.
@@ -33,8 +43,10 @@ Let's look at the following diagram to see what processes we would be running vi
 Let's start adding files so that you will know what we are doing.
 
 Create laravel 9 dockerfile
+
 First of all, let's create a dockerfile for our production use. Go to your laravel 9 project root folder and create a file called Dockerfile with following contents:
 
+```
 FROM php:8.0-fpm
 
 # Set working directory
@@ -97,24 +109,32 @@ RUN chmod +x /var/www/docker/run.sh
 
 EXPOSE 80
 ENTRYPOINT ["/var/www/docker/run.sh"]
+
+```
+
+
 What are we doing in this file:
 
-we are using php8-fpm official docker image
-defining /var/www as our project root directory
-installing necessary php extentions
-installing supervisor and composer
-creating a www user to run our nginx as www user
-copying all laravel project files to /var/www directory with proper permissions
-applying correct write permissions for our storage folder
-copying configurations file for
-supervisor
-php
-nginx
+- we are using php8-fpm official docker image
+- defining /var/www as our project root directory
+- installing necessary php extentions
+- installing supervisor and composer
+- creating a www user to run our nginx as www user
+- copying all laravel project files to /var/www directory with proper permissions
+- applying correct write permissions for our storage folder
+- copying configurations file for
+1. supervisor
+2. php
+3. nginx
+
 finally running composer to install required project dependencies
 setting entrypoint for our docker project
 Add configuration files for php, nginx and supervisor
-Our Dockerfile requires some of the configuration files. Let's create a directory called docker inside your laravel 8 project and create following files:
+Our Dockerfile requires some of the configuration files. 
 
+Let's create a directory called docker inside your laravel 9 project and create following files:
+
+```
 # Directory structure
 |- docker
     |- nginx.conf
@@ -245,6 +265,7 @@ php artisan route:cache
 
 /usr/bin/supervisord -c /etc/supervisord.conf
 run.sh is basically our entrypoint for the container. We are performing some of the necessary deployment steps here for laravel project:
+```
 
 running migrations
 clearing route and other cache
