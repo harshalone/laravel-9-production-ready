@@ -43,6 +43,7 @@ RUN useradd -u 1000 -ms /bin/bash -g www www
 COPY --chown=www:www-data . /var/www
 
 # add root to www group
+
 RUN chmod -R ug+w /var/www/storage
 
 # Copy nginx/php/supervisor configs
@@ -55,8 +56,18 @@ RUN mkdir /var/log/php
 RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
 
 # Deployment steps
+#System doesnt allow composer to run as root, so change users
+RUN su www
+USER www-data:www-data
+# do composer update before composer install, or system gives an error
+RUN composer update
+# now finally run composer install
 RUN composer install --optimize-autoloader --no-dev
+#now change back to root user since we are finished installing composer in the container
+USER root
+RUN exit
 RUN chmod +x /var/www/docker/run.sh
 
 EXPOSE 80
 ENTRYPOINT ["/var/www/docker/run.sh"]
+
